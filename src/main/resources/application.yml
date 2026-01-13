@@ -23,6 +23,11 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
+mesh:
+  jwt:
+    secret: ${JWT_SECRET:change-this-dev-only-secret-change-this-dev-only-secret}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+
 management:
   endpoints:
     web:
