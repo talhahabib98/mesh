@@ -20,13 +20,22 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
 server:
   port: ${SERVER_PORT:8080}
 
 mesh:
+  node:
+    id: ${NODE_ID:node-local}
   jwt:
     secret: ${JWT_SECRET:change-this-dev-only-secret-change-this-dev-only-secret}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+  redis:
+    chat-channel: mesh:chat:broadcast
 
 management:
   endpoints:
