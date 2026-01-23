@@ -19,14 +19,22 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic presenceTopic() {
+        return new ChannelTopic(channelProperties.presenceChannel());
+    }
+
+    @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory connectionFactory,
             ChatMessageSubscriber chatMessageSubscriber,
-            ChannelTopic chatTopic) {
+            PresenceSubscriber presenceSubscriber,
+            ChannelTopic chatTopic,
+            ChannelTopic presenceTopic) {
 
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(chatMessageSubscriber, chatTopic);
+        container.addMessageListener(presenceSubscriber, presenceTopic);
         return container;
     }
 }

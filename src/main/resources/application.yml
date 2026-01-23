@@ -36,6 +36,8 @@ mesh:
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
   redis:
     chat-channel: mesh:chat:broadcast
+    presence-channel: mesh:chat:presence
+    presence-key-prefix: "mesh:presence:"
 
 management:
   endpoints:
