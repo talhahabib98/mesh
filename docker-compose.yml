@@ -1,0 +1,69 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: mesh
+      POSTGRES_USER: mesh
+      POSTGRES_PASSWORD: mesh
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mesh"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app1:
+    build: .
+    environment: &app_env
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: mesh
+      DB_USER: mesh
+      DB_PASSWORD: mesh
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SERVER_PORT: 8080
+      JWT_SECRET: change-this-dev-only-secret-change-this-dev-only-secret
+      NODE_ID: node-1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  app2:
+    build: .
+    environment:
+      <<: *app_env
+      NODE_ID: node-2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+
+volumes:
+  pgdata:
